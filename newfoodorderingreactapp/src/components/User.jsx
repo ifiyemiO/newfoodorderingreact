@@ -62,17 +62,19 @@ function User() {
               required
             />
           </label>
-          <br />
-          <label>
-            Email:
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
-          <br />
+
+          <p>
+            <label>
+              Email:
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </label>
+          </p>
+
           <label>
             Phone Number:
             <input
@@ -86,8 +88,6 @@ function User() {
           <button type="submit">Add User</button>
         </form>
         {message && <p>{message}</p>}
-
-        {/* List of Users */}
       </div>
     </div>
   );

@@ -12,13 +12,11 @@ import hotChocolateImg from "../images/HOT_CHOCOLATE.jpg";
 import croissantImg from "../images/CROISSANT.jpg";
 import donutImg from "../images/DONUT_01.jpg";
 import cookieImg01 from "../images/COOKIE_01.jpg";
-import cookieImg02 from "../images/COOKIE_02.jpg";
-// import "../App.css";
-// import "./App.css";
+import cookieImg02 from "../images/TEA_BISCUIT.jpg";
+import cappucinnoImg from "../images/CAPPUCCINO.jpg";
 
 function Order() {
   const [customerName, setCustomerName] = useState("");
-  //const [totalAmount, setTotalAmount] = useState("");
   const [message, setMessage] = useState("");
   const [filteredMenu, setFilteredMenu] = useState([]); // Filtered menu based on category
   const [orderItems, setOrderItems] = useState([]);
@@ -47,73 +45,94 @@ function Order() {
       description: "Fresh veggie burger",
       image: veggieBurgerImg,
     },
+    {
+      id: 4,
+      name: "Ham Burger",
+      price: 6.49,
+      description: "Burger with ham and fresh toppings.",
+      image: veggieBurgerImg,
+    },
 
     // Pizzas
     {
-      id: 4,
+      id: 5,
       name: "Hawaiian Pizza",
       price: 10.99,
       description: "Pineapple and ham",
       image: hawaiianPizzaImg,
     },
     {
-      id: 5,
+      id: 6,
       name: "Pizza Special",
       price: 8.99,
       description: "Loaded with cheese and toppings",
       image: pizza01Img,
     },
     {
-      id: 6,
+      id: 7,
       name: "Pepperoni Pizza",
       price: 9.49,
       description: "Topped with pepperoni",
       image: pizza02Img,
     },
+    {
+      id: 8,
+      name: "Cheese Pizza",
+      price: 8.49,
+      description: "Classic cheese pizza",
+      image: pizza02Img,
+    },
 
     // Beverages
     {
-      id: 7,
-      name: "Coffee & Tea",
+      id: 9,
+      name: "Latte",
       price: 2.99,
-      description: "Refreshing beverages",
+      description: "Smooth espresso with steamed milk",
       image: coffeeTeaImg,
     },
     {
-      id: 8,
+      id: 10,
       name: "Hot Chocolate",
       price: 3.49,
       description: "Creamy hot chocolate",
       image: hotChocolateImg,
     },
+    {
+      id: 11,
+      name: "Cappuccino",
+      price: 3.99,
+      description: "Espresso with frothy milk",
+      image: cappucinnoImg,
+    },
 
     // Baked Goods
     {
-      id: 9,
+      id: 12,
       name: "Croissant",
       price: 2.99,
       description: "Buttery and flaky",
       image: croissantImg,
     },
     {
-      id: 10,
+      id: 13,
       name: "Donut",
       price: 1.99,
       description: "Sweet glazed donut",
       image: donutImg,
     },
     {
-      id: 11,
+      id: 14,
       name: "Cookie - Choco",
       price: 1.49,
       description: "Chocolate chip cookie",
       image: cookieImg01,
     },
     {
-      id: 12,
-      name: "Cookie - Sugar",
+      id: 15,
+      name: "Tea Bun",
       price: 1.29,
-      description: "Classic sugar cookie",
+      description: "Sweet buns perfect with tea",
       image: cookieImg02,
     },
   ];

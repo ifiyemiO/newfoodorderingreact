@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import burgersImg from "../images/burger.jpg";
 import pizzaImg from "../images/pizza.jpg";
@@ -7,6 +8,13 @@ import beveragesImg from "../images/coffee-tea.jpg";
 import bakedGoodsImg from "../images/baked-goods.jpg";
 
 function Welcome() {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (category) => {
+    // Navigate to the Order page and pass category as query parameter
+    navigate(`/order?category=${category}`);
+  };
+
   return (
     <div className="home-container">
       <p>Select a category to view menu items:</p>
