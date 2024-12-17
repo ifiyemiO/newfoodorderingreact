@@ -76,7 +76,6 @@ function App() {
 
       <Routes>
         <Route path="/home" element={<Welcome />} />
-
         <Route path="/about" element={<AboutUs />} />
         <Route path="/menu" element={<Menu menu={menuItems} />} />
         <Route path="/order" element={<Order />} />
