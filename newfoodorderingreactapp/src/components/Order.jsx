@@ -7,6 +7,7 @@ import veggieBurgerImg from "../images/VEGGIE_BURGER.jpg";
 import hawaiianPizzaImg from "../images/HAWAIIAN_PIZZA.jpg";
 import pizza01Img from "../images/PIZZA_01.jpg";
 import pizza02Img from "../images/PIZZA_02.png";
+import pizza03Img from "../images/PIZZA_03.jpg";
 import coffeeTeaImg from "../images/coffee-tea.jpg";
 import hotChocolateImg from "../images/HOT_CHOCOLATE.jpg";
 import croissantImg from "../images/CROISSANT.jpg";
@@ -73,7 +74,7 @@ function Order() {
       name: "Pepperoni Pizza",
       price: 9.49,
       description: "Topped with pepperoni",
-      image: pizza02Img,
+      image: pizza03Img,
     },
     {
       id: 8,
