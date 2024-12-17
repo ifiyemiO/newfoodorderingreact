@@ -88,14 +88,6 @@ function User() {
         {message && <p>{message}</p>}
 
         {/* List of Users */}
-        <h2>All Users</h2>
-        <ul>
-          {users.map((user) => (
-            <li key={user.id}>
-              <strong>{user.name}</strong> ({user.email}) - {user.phoneNumber}
-            </li>
-          ))}
-        </ul>
       </div>
     </div>
   );

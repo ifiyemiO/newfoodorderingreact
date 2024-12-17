@@ -1,13 +1,31 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 // import "./App.css";
 
 function Menu() {
+  const location = useLocation();
   const [menuItems, setMenuItems] = useState([]);
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  // Define filteredMenu based on category
+  const [searchCategory, setSearchCategory] = useState("");
+  const filteredMenu = searchCategory
+    ? menuItems.filter((item) => item.category === searchCategory)
+    : menuItems;
+
+  // Parse query parameters
+  const queryParams = new URLSearchParams(location.search);
+  const category = queryParams.get("category"); // e.g., "burgers"
+
+  // Filter menu items based on the category
+  const filteredItems = category
+    ? filteredMenu.filter((item) => item.category === category)
+    : filteredMenu;
 
   // Fetch menu items from the backend
   useEffect(() => {
@@ -49,30 +67,12 @@ function Menu() {
       setPrice("");
     } catch (error) {
       console.error("Error adding menu item:", error);
-      setMessage("Failed to add menu item. Please try again.");
+      setMessage("");
     }
   };
 
   return (
     <div className="centered-container">
-      <h1>Menu Items</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>} {/* Display error */}
-      <ul>
-        {menuItems.map((item) => (
-          <li key={item.id} className="menu-item">
-            <img
-              src={
-                item.imageUrl || "http://localhost:8080/images/placeholder.jpg"
-              }
-              alt={item.name}
-              className="menu-item-image"
-            />
-            <div>
-              <strong>{item.name}</strong>: ${item.price.toFixed(2)}
-            </div>
-          </li>
-        ))}
-      </ul>
       <h2>Add a New Menu Item</h2>
       <form onSubmit={handleAddMenuItem}>
         <label>
@@ -85,6 +85,17 @@ function Menu() {
           />
         </label>
         <br />
+        <p>
+          <label>
+            Description:
+            <input
+              type="text"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </label>
+        </p>
         <label>
           Price:
           <input

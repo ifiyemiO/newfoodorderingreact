@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import burgersImg from "../images/burger.jpg";
 import pizzaImg from "../images/pizza.jpg";
 import beveragesImg from "../images/coffee-tea.jpg";
@@ -11,7 +12,11 @@ function Welcome() {
       <p>Select a category to view menu items:</p>
       <div className="categories">
         {/* Burgers */}
-        <Link to="/menu/burgers" className="category-link">
+        <Link
+          to="/order"
+          state={{ category: "burgers" }}
+          className="category-link"
+        >
           <img src={burgersImg} alt="Burgers" className="category-image" />
           <h3>Burgers</h3>
         </Link>
@@ -39,6 +44,7 @@ function Welcome() {
         </Link>
       </div>
 
+      {/* About Us Section */}
       <div id="about-us" className="about-us">
         <h1>About Us</h1>
         <p>

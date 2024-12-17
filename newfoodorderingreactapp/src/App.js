@@ -10,6 +10,7 @@ import User from "./components/User";
 import AboutUs from "./components/AboutUs";
 import Welcome from "./components/Welcome";
 import { fetchMenuItems } from "./utils/apicalls";
+import Footer from "./components/Footer";
 
 function App() {
   const [menuItems, setMenuItems] = useState([]);
@@ -70,6 +71,9 @@ function App() {
           </nav>
         </nav>
       </div>
+
+      <Footer />
+
       <Routes>
         <Route path="/home" element={<Welcome />} />
         <Route path="/" element={<Home />} />
