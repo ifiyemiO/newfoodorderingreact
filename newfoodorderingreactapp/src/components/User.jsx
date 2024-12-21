@@ -12,7 +12,9 @@ function User() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/users/all");
+        const response = await axios.get(
+          "http://localhost:8080/New-FoodOrdering/users/all"
+        );
         setUsers(response.data);
       } catch (error) {
         console.error("Error fetching users:", error);
@@ -46,9 +48,23 @@ function User() {
   };
 
   return (
-    <div className="centered-container">
+    <div className="home-container">
       <div>
-        <h1>Users</h1>
+        {/* Display List of Users */}
+        <h2>User List</h2>
+        {users.length > 0 ? (
+          <ul>
+            {users.map((user) => (
+              <li key={user.id}>
+                <strong>{user.name}</strong>
+                <p>Email: {user.email}</p>
+                <p>Phone: {user.phoneNumber}</p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No users found.</p>
+        )}
 
         {/* Form to Add User */}
         <h2>Add a New User</h2>
