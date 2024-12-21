@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useLocation } from "react-router-dom";
-// import "./App.css";
 
 function Menu() {
   const location = useLocation();
@@ -9,23 +8,22 @@ function Menu() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [inputCategory, setInputCategory] = useState(""); // Renamed state variable
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // Define filteredMenu based on category
-  const [searchCategory, setSearchCategory] = useState("");
-  const filteredMenu = searchCategory
-    ? menuItems.filter((item) => item.category === searchCategory)
+  // Extract category from location or query params
+  const categoryFromState = location.state?.category; // From React Router state
+  const queryParams = new URLSearchParams(location.search); // From query string
+  const categoryFromQuery = queryParams.get("category"); // Extracted category
+
+  // Determine which category to use
+  const selectedCategory = categoryFromState || categoryFromQuery;
+
+  // Filter menu items based on the selected category
+  const filteredMenu = selectedCategory
+    ? menuItems.filter((item) => item.category === selectedCategory)
     : menuItems;
-
-  // Parse query parameters
-  const queryParams = new URLSearchParams(location.search);
-  const category = queryParams.get("category"); // e.g., "burgers"
-
-  // Filter menu items based on the category
-  const filteredItems = category
-    ? filteredMenu.filter((item) => item.category === category)
-    : filteredMenu;
 
   // Fetch menu items from the backend
   useEffect(() => {
@@ -50,7 +48,9 @@ function Menu() {
     e.preventDefault();
     const newMenuItem = {
       name,
+      description,
       price: parseFloat(price),
+      category: inputCategory, // Use renamed state variable
     };
 
     try {
@@ -65,6 +65,8 @@ function Menu() {
       setMenuItems((prevItems) => [...prevItems, response.data]);
       setName("");
       setPrice("");
+      setDescription("");
+      setInputCategory(""); // Reset category input
     } catch (error) {
       console.error("Error adding menu item:", error);
       setMessage("");
@@ -72,7 +74,19 @@ function Menu() {
   };
 
   return (
-    <div className="centered-container">
+    <div className="menu-container">
+      <h1>Menu Items</h1>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      <ul>
+        {filteredMenu.map((item) => (
+          <li key={item.id}>
+            <h3>{item.name}</h3>
+            <p>{item.description}</p>
+            <p>${item.price.toFixed(2)}</p>
+            <p>Category: {item.category}</p>
+          </li>
+        ))}
+      </ul>
       <h2>Add a New Menu Item</h2>
       <form onSubmit={handleAddMenuItem}>
         <label>
@@ -85,17 +99,18 @@ function Menu() {
           />
         </label>
         <br />
-        <p>
-          <label>
-            Description:
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              required
-            />
-          </label>
-        </p>
+
+        <label>
+          Description:
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+          />
+        </label>
+        <br />
+
         <label>
           Price:
           <input
@@ -107,10 +122,21 @@ function Menu() {
           />
         </label>
         <br />
+
+        <label>
+          Category:
+          <input
+            type="text"
+            value={inputCategory}
+            onChange={(e) => setInputCategory(e.target.value)} // Updated inputCategory
+            required
+          />
+        </label>
+        <br />
+
         <button type="submit">Add Menu Item</button>
       </form>
-      {message && <p style={{ color: "green" }}>{message}</p>}{" "}
-      {/* Display message */}
+      {message && <p style={{ color: "green" }}>{message}</p>}
     </div>
   );
 }

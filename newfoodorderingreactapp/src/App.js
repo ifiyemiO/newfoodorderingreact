@@ -8,7 +8,7 @@ import Menu from "./components/Menu";
 import Order from "./components/Order";
 import User from "./components/User";
 import AboutUs from "./components/AboutUs";
-import Welcome from "./components/Welcome";
+import Restaurant from "./components/Restaurant";
 import { fetchMenuItems } from "./utils/apicalls";
 import Footer from "./components/Footer";
 
@@ -67,6 +67,9 @@ function App() {
               <li>
                 <Link to="/user">Users</Link>
               </li>
+              <li>
+                <Link to="/restaurants">Restaurant</Link>
+              </li>
             </ul>
           </nav>
         </nav>
@@ -75,11 +78,13 @@ function App() {
       <Footer />
 
       <Routes>
-        <Route path="/home" element={<Welcome />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/about" element={<AboutUs />} />
         <Route path="/menu" element={<Menu menu={menuItems} />} />
         <Route path="/order" element={<Order />} />
         <Route path="/user" element={<User />} />
+        <Route path="/restaurants" element={<Restaurant />} />
       </Routes>
     </Router>
   );

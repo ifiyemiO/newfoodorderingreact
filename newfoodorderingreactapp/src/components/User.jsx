@@ -29,7 +29,7 @@ function User() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/New-FoodOrdering/users/all",
+        "http://localhost:8080/New-FoodOrdering/users/add",
         newUser
       );
       setMessage(`User "${response.data.name}" added successfully!`);
