@@ -6,6 +6,8 @@ function Restaurant() {
   const [name, setName] = useState("");
   const [location, setLocation] = useState("");
   const [message, setMessage] = useState("");
+  const [showRestaurant, setShowRestaurant] = useState(false);
+  const [selectedRestaurant, setSelectedRestaurant] = useState(null); // Track selected restaurant for update
 
   // Fetch all restaurants
   useEffect(() => {
@@ -24,50 +26,104 @@ function Restaurant() {
     fetchRestaurants();
   }, []);
 
-  // Add a new restaurant
-  const handleAddRestaurant = async (e) => {
+  // Add or update a restaurant
+  const handleAddOrUpdateRestaurant = async (e) => {
     e.preventDefault();
-    const newRestaurant = { name, location };
 
+    const restaurantData = { name, location };
+
+    if (selectedRestaurant) {
+      // Update existing restaurant
+      try {
+        const response = await axios.put(
+          `http://localhost:8080/New-FoodOrdering/restaurants/update/${selectedRestaurant.id}`,
+          restaurantData,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        setMessage(`Restaurant "${response.data.name}" updated successfully!`);
+        setRestaurants((prevRestaurants) =>
+          prevRestaurants.map((restaurant) =>
+            restaurant.id === selectedRestaurant.id ? response.data : restaurant
+          )
+        );
+        setSelectedRestaurant(null); // Clear selection
+      } catch (error) {
+        console.error("Error updating restaurant:", error);
+        setMessage(
+          `Failed to update restaurant: ${
+            error.response?.data?.message || error.message
+          }`
+        );
+      }
+    } else {
+      // Add new restaurant
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/New-FoodOrdering/restaurants/add",
+          restaurantData,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        setMessage(`Restaurant "${response.data.name}" added successfully!`);
+        setRestaurants((prevRestaurants) => [
+          ...prevRestaurants,
+          response.data,
+        ]);
+      } catch (error) {
+        console.error("Error adding restaurant:", error);
+        setMessage(
+          `Failed to add restaurant: ${
+            error.response?.data?.message || error.message
+          }`
+        );
+      }
+    }
+
+    setName("");
+    setLocation("");
+  };
+
+  // Delete a restaurant
+  const handleDeleteRestaurant = async (id) => {
     try {
-      const response = await axios.post(
-        "http://localhost:8080/restaurants/add",
-        newRestaurant,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
+      await axios.delete(
+        `http://localhost:8080/New-FoodOrdering/restaurants/delete/${id}`
       );
-      setMessage(`Restaurant "${response.data.name}" added successfully!`);
-      setRestaurants((prevRestaurants) => [...prevRestaurants, response.data]);
-      setName("");
-      setLocation("");
+      setMessage("Restaurant deleted successfully!");
+      setRestaurants((prevRestaurants) =>
+        prevRestaurants.filter((restaurant) => restaurant.id !== id)
+      );
     } catch (error) {
-      console.error("Error adding restaurant:", error);
+      console.error("Error deleting restaurant:", error);
       setMessage(
-        `Failed to add restaurant: ${
+        `Failed to delete restaurant: ${
           error.response?.data?.message || error.message
         }`
       );
     }
   };
 
+  // Edit a restaurant
+  const handleEditRestaurant = (restaurant) => {
+    setSelectedRestaurant(restaurant);
+    setName(restaurant.name);
+    setLocation(restaurant.location);
+  };
+
+  const handleShowRestaurant = () => {
+    setShowRestaurant(true);
+  };
+
   return (
-    <div className="centered-container">
-      <h1>Restaurants</h1>
-
-      {/* Display List of Restaurants */}
-      <ul>
-        {restaurants.map((restaurant) => (
-          <li key={restaurant.id}>
-            <h3>{restaurant.name}</h3>
-            <p>Location: {restaurant.location}</p>
-          </li>
-        ))}
-      </ul>
-
-      {/* Form to Add New Restaurant */}
-      <h2>Add a New Restaurant</h2>
-      <form onSubmit={handleAddRestaurant}>
+    <div className="menu-container">
+      {/* Form to Add or Update Restaurant */}
+      <h2>
+        {selectedRestaurant ? "Update Restaurant" : "Add a New Restaurant"}
+      </h2>
+      <form onSubmit={handleAddOrUpdateRestaurant}>
         <label>
           Name:
           <input
@@ -89,8 +145,63 @@ function Restaurant() {
           />
         </label>
         <br />
-        <button type="submit">Add Restaurant</button>
+        <button type="submit">
+          {selectedRestaurant ? "Update" : "Add"} Restaurant
+        </button>
+        {selectedRestaurant && (
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedRestaurant(null);
+              setName("");
+              setLocation("");
+            }}
+          >
+            Cancel
+          </button>
+        )}
+        <br />
+        <button type="button" onClick={handleShowRestaurant}>
+          Show Restaurants
+        </button>
       </form>
+
+      {showRestaurant && (
+        <table
+          border="1"
+          style={{ marginTop: "20px", width: "100%", textAlign: "left" }}
+        >
+          <thead>
+            <h1>Restaurants</h1>
+            <tr>
+              <th>Name</th>
+              <th>Location</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+
+          {/* Display List of Restaurants */}
+          <tbody>
+            {restaurants.map((restaurant) => (
+              <tr key={restaurant.id}>
+                <td>{restaurant.name}</td>
+                <td>{restaurant.location}</td>
+                <td>
+                  <button onClick={() => handleEditRestaurant(restaurant)}>
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDeleteRestaurant(restaurant.id)}
+                    style={{ marginLeft: "10px", color: "white" }}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {message && <p>{message}</p>}
     </div>
   );

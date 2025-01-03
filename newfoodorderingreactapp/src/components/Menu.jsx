@@ -8,24 +8,21 @@ function Menu() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [inputCategory, setInputCategory] = useState(""); // Renamed state variable
+  const [inputCategory, setInputCategory] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
+  const [editItemId, setEditItemId] = useState(null); // Track item being edited
 
-  // Extract category from location or query params
-  const categoryFromState = location.state?.category; // From React Router state
-  const queryParams = new URLSearchParams(location.search); // From query string
-  const categoryFromQuery = queryParams.get("category"); // Extracted category
-
-  // Determine which category to use
+  const categoryFromState = location.state?.category;
+  const queryParams = new URLSearchParams(location.search);
+  const categoryFromQuery = queryParams.get("category");
   const selectedCategory = categoryFromState || categoryFromQuery;
 
-  // Filter menu items based on the selected category
   const filteredMenu = selectedCategory
     ? menuItems.filter((item) => item.category === selectedCategory)
     : menuItems;
 
-  // Fetch menu items from the backend
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
@@ -33,7 +30,7 @@ function Menu() {
           "http://localhost:8080/New-FoodOrdering/menu_items/all"
         );
         setMenuItems(response.data);
-        setError(""); // Clear any previous errors
+        setError("");
       } catch (error) {
         console.error("Error fetching menu items:", error);
         setError("Failed to fetch menu items. Please try again.");
@@ -43,51 +40,77 @@ function Menu() {
     fetchMenuItems();
   }, []);
 
-  // Handle form submission to add a new menu item
   const handleAddMenuItem = async (e) => {
     e.preventDefault();
     const newMenuItem = {
       name,
       description,
       price: parseFloat(price),
-      category: inputCategory, // Use renamed state variable
+      category: inputCategory,
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/New-FoodOrdering/menu_items/add",
-        newMenuItem,
-        {
-          headers: { "Content-Type": "application/json" },
-        }
-      );
-      setMessage(`Menu item "${response.data.name}" added successfully!`);
-      setMenuItems((prevItems) => [...prevItems, response.data]);
+      if (editItemId) {
+        // Update existing item
+        await axios.put(
+          `http://localhost:8080/New-FoodOrdering/menu_items/update/${editItemId}`,
+          newMenuItem,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        setMessage(`Menu item "${name}" updated successfully!`);
+        setEditItemId(null); // Reset edit mode
+      } else {
+        // Add new item
+        const response = await axios.post(
+          "http://localhost:8080/New-FoodOrdering/menu_items/add",
+          newMenuItem,
+          {
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        setMessage(`Menu item "${response.data.name}" added successfully!`);
+        setMenuItems((prevItems) => [...prevItems, response.data]);
+      }
       setName("");
       setPrice("");
       setDescription("");
-      setInputCategory(""); // Reset category input
+      setInputCategory("");
     } catch (error) {
-      console.error("Error adding menu item:", error);
+      console.error("Error saving menu item:", error);
       setMessage("");
+    }
+  };
+
+  const handleShowMenu = () => {
+    setShowMenu(true);
+  };
+
+  const handleEditMenuItem = (item) => {
+    setName(item.name);
+    setDescription(item.description);
+    setPrice(item.price);
+    setInputCategory(item.category);
+    setEditItemId(item.id); // Track the item being edited
+  };
+
+  const handleDeleteMenuItem = async (id) => {
+    try {
+      await axios.delete(
+        `http://localhost:8080/New-FoodOrdering/menu_items/delete/${id}`
+      );
+      setMessage("Menu item deleted successfully!");
+      setMenuItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("Error deleting menu item:", error);
+      setMessage("Failed to delete menu item.");
     }
   };
 
   return (
     <div className="menu-container">
-      <h1>Menu Items</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <ul>
-        {filteredMenu.map((item) => (
-          <li key={item.id}>
-            <h3>{item.name}</h3>
-            <p>{item.description}</p>
-            <p>${item.price.toFixed(2)}</p>
-            <p>Category: {item.category}</p>
-          </li>
-        ))}
-      </ul>
-      <h2>Add a New Menu Item</h2>
+      <h2>{editItemId ? "Edit Menu Item" : "Add a New Menu Item"}</h2>
       <form onSubmit={handleAddMenuItem}>
         <label>
           Name:
@@ -128,15 +151,57 @@ function Menu() {
           <input
             type="text"
             value={inputCategory}
-            onChange={(e) => setInputCategory(e.target.value)} // Updated inputCategory
+            onChange={(e) => setInputCategory(e.target.value)}
             required
           />
         </label>
         <br />
 
-        <button type="submit">Add Menu Item</button>
+        <button type="submit">
+          {editItemId ? "Update Menu Item" : "Add Menu Item"}
+        </button>
+        <br />
+        {!editItemId && <button onClick={handleShowMenu}>Show Menu</button>}
       </form>
       {message && <p style={{ color: "green" }}>{message}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      {showMenu && (
+        <table
+          border="1"
+          style={{ marginTop: "20px", width: "100%", textAlign: "left" }}
+        >
+          <thead>
+            <h1>Menu Items</h1>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Price</th>
+              <th>Category</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredMenu.map((item) => (
+              <tr key={item.id}>
+                <td>{item.name}</td>
+                <td>{item.description}</td>
+                <td>${item.price.toFixed(2)}</td>
+                <td>{item.category}</td>
+                <td>
+                  <button onClick={() => handleEditMenuItem(item)}>Edit</button>
+                  <button
+                    onClick={() => handleDeleteMenuItem(item.id)}
+                    style={{ marginLeft: "10px", color: "white" }}
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </div>
   );
 }

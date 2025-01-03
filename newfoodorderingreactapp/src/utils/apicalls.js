@@ -15,3 +15,8 @@ export const fetchRestaurants = async () => {
   const response = await axios.get("/restaurants");
   return response.data;
 };
+
+export const fetchUsers = async () => {
+  const response = await axios.get("/users");
+  return response.data;
+};
