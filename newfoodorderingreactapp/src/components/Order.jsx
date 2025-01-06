@@ -275,7 +275,6 @@ function Order() {
                   <th>Order ID</th>
                   <th>Customer Name</th>
                   <th>Order Date</th>
-                  <th>Total Amount</th>
                 </tr>
               </thead>
               <tbody>
@@ -284,13 +283,6 @@ function Order() {
                     <td>{order.id}</td>
                     <td>{order.customerName}</td>
                     <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                    <td>
-                      $
-                      {order.totalAmount !== undefined &&
-                      order.totalAmount !== null
-                        ? order.totalAmount.toFixed(2)
-                        : "0.00"}
-                    </td>
                   </tr>
                 ))}
               </tbody>
