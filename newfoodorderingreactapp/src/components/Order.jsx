@@ -4,6 +4,8 @@ import { useLocation } from "react-router-dom";
 
 function Order() {
   const [customerName, setCustomerName] = useState("");
+  const [restaurantId, setRestaurantId] = useState("");
+  const [restaurants, setRestaurants] = useState([]);
   const [message, setMessage] = useState("");
   const [filteredMenu, setFilteredMenu] = useState([]);
   const [orderItems, setOrderItems] = useState([]);
@@ -13,6 +15,22 @@ function Order() {
   const [menuItems, setMenuItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [showOrderHistory, setShowOrderHistory] = useState(false);
+
+  useEffect(() => {
+    // Fetch restaurants for the dropdown
+    const fetchRestaurants = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/New-FoodOrdering/restaurants/all"
+        );
+        setRestaurants(response.data);
+      } catch (error) {
+        console.error("Error fetching restaurants:", error);
+      }
+    };
+
+    fetchRestaurants();
+  }, []);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -104,11 +122,28 @@ function Order() {
 
   const handleOrderSubmit = async (e) => {
     e.preventDefault();
+
+    if (!restaurantId) {
+      setMessage("Please select a restaurant.");
+      return;
+    }
+
+    const selectedRestaurant = restaurants.find(
+      (r) => r.id === parseInt(restaurantId)
+    );
+
+    if (!selectedRestaurant) {
+      setMessage("Selected restaurant not found.");
+      return;
+    }
+
     const order = {
       customerName,
       items: orderItems,
       orderDate: new Date().toISOString(),
       totalAmount, // Include totalAmount explicitly
+      restaurantId: selectedRestaurant.name,
+      restaurantLocation: selectedRestaurant.location,
     };
 
     try {
@@ -119,6 +154,7 @@ function Order() {
       setMessage("Order submitted successfully!");
       setOrderItems([]);
       setTotalAmount(0);
+      setRestaurantId([]);
     } catch (error) {
       console.error("Error submitting order:", error);
       setMessage("Error submitting order.");
@@ -143,6 +179,25 @@ function Order() {
               required
             />
           </label>
+
+          <label>
+            Select Restaurant:
+            <select
+              value={restaurantId}
+              onChange={(e) => setRestaurantId(e.target.value)}
+              required
+            >
+              <option value="">--Select a Restaurant--</option>
+              {restaurants.map((restaurant) => (
+                <option key={restaurant.id} value={restaurant.id}>
+                  {restaurant.name} ({restaurant.location})
+                </option>
+              ))}
+            </select>
+          </label>
+          <br />
+
+          {/* Add menu items and total amount fields as needed */}
           <button type="submit" disabled={orderItems.length === 0}>
             Submit Order
           </button>
@@ -167,7 +222,7 @@ function Order() {
             }}
           >
             <img
-              src={item.imageUrl || "https://via.placeholder.com/150"}
+              src={item.imageUrl || "coffee.jpg"}
               alt={item.name}
               style={{
                 width: "100%",
@@ -266,31 +321,35 @@ function Order() {
       <div>
         <button onClick={handleShowOrderHistory}>Show Order History</button>
         {error && <p style={{ color: "red" }}>{error}</p>}
-        {orders.length > 0 ? (
-          showOrderHistory && (
-            <table>
-              <thead>
-                <h1>Order History</h1>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Customer Name</th>
-                  <th>Order Date</th>
+        {showOrderHistory && orders.length > 0 ? (
+          <table>
+            <thead>
+              <h1>Order History</h1>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Order Date</th>
+                <th>Total Amount</th>
+                <th>Restaurant Name</th>
+                <th>Restaurant Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td>{order.id}</td>
+                  <td>{order.customerName}</td>
+                  <td>{new Date(order.orderDate).toLocaleDateString()}</td>
+                  <td>${order.totalAmount}</td>
+                  <td>{order.restaurantName}</td>
+                  <td>{order.restaurantLocation}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {orders.map((order) => (
-                  <tr key={order.id}>
-                    <td>{order.id}</td>
-                    <td>{order.customerName}</td>
-                    <td>{new Date(order.orderDate).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )
-        ) : (
+              ))}
+            </tbody>
+          </table>
+        ) : showOrderHistory && orders.length === 0 ? (
           <p>No orders found.</p>
-        )}
+        ) : null}
       </div>
     </div>
   );

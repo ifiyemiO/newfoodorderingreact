@@ -8,6 +8,7 @@ function Restaurant() {
   const [message, setMessage] = useState("");
   const [showRestaurant, setShowRestaurant] = useState(false);
   const [selectedRestaurant, setSelectedRestaurant] = useState(null); // Track selected restaurant for update
+  const [error, setError] = useState("");
 
   // Fetch all restaurants
   useEffect(() => {
@@ -17,9 +18,10 @@ function Restaurant() {
           "http://localhost:8080/New-FoodOrdering/restaurants/all"
         );
         setRestaurants(response.data);
+        //SpeechSynthesisErrorEvent("");
       } catch (error) {
         console.error("Error fetching restaurants:", error);
-        setMessage("Failed to fetch restaurants. Please try again.");
+        setError("Failed to fetch restaurants.");
       }
     };
 
